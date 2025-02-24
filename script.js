@@ -56,8 +56,16 @@ function init() {
     // Iluminação
     const ambientLight = new THREE.AmbientLight(0x333333);
     scene.add(ambientLight);
+    // Ativando o sombreamento
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    
+    // Fazer com que a luz do Sol seja um ponto de luz
     const sunLight = new THREE.PointLight(0xffffff, 2, 300);
     sunLight.position.set(0, 0, 0);
+    sunLight.castShadow = true;
+    // sunLight.shadow.mapSize.width = 512;
+    // sunLight.shadow.mapSize.height = 512;
     scene.add(sunLight);
 
     // Carrega a textura do Sol
@@ -173,11 +181,13 @@ function init() {
 
       // Adiciona a Lua para a Terra
       if (data.name === 'Terra') {
+        planetMesh.receiveShadow = true;
         const moonPivot = new THREE.Object3D();
         planetMesh.add(moonPivot);
         const moonGeometry = new THREE.SphereGeometry(0.2, 16, 16);
         const moonMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
         const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial);
+        moonMesh.castShadow = true;
         // Posiciona a Lua a uma distância didática da Terra
         moonMesh.position.x = data.size + 0.5;
         moonMesh.userData = {
@@ -305,5 +315,8 @@ function animate() {
     controls.update();
   }
 
+  // Rotaciona a cena para dar movimento
+  scene.rotation.y += 0.002;
+  
   renderer.render(scene, camera);
 }
